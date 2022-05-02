@@ -6,16 +6,7 @@ dotenv.config();
 
 async function connect() {
   try {
-    // Lấy đường dẫn tới file ca-certificate.crt
-    const mongoCertPath = path.join(__dirname, 'ca-certificate.crt');
-
-    await mongoose.connect(
-      process.env.DB_URL, {
-      authSource: 'admin',
-      replicaSet: 'db-lobo',
-      tls: true,
-      tlsCAFile: mongoCertPath
-    })
+    await mongoose.connect(process.env.DB_URL);
     console.log('Connect successfully');
   } catch (error) {
     console.log('Connect failure');
