@@ -8,7 +8,7 @@ router.get('/verify/:id', authController.verifiedUser);
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.post('/logout', middlewares.verifyToken, authController.logout);
-router.patch('/refresh-token', authController.refreshToken);
+router.put('/refresh-token', authController.refreshToken);
 
 
 module.exports = router;

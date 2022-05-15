@@ -1,4 +1,4 @@
-const {schemaUser, schemaLoginInfo, schemaPost} = require('../schema');
+const {schemaUser, schemaLoginInfo, schemaPost, schemaComment} = require('../schema');
 
 function validateUserRegister(body){
     const result = schemaUser.validate(body);
@@ -15,8 +15,14 @@ function validatePost(body){
     return result;
 }
 
+function validateComment(body){
+    const result = schemaComment.validate(body);
+    return result;
+}
+
 module.exports = {
     validateUserRegister, 
     validateUserLogin,
-    validatePost
+    validatePost,
+    validateComment
 };

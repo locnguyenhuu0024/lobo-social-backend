@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
 
+const ObjectId = mongoose.Types.ObjectId;
+
 const postSchema = new mongoose.Schema(
     {
-        author: {
-            type: String,
+        authorID: {
+            type: ObjectId,
+            ref: 'User',
             required: true
         },
         pathImages: {
@@ -14,14 +17,18 @@ const postSchema = new mongoose.Schema(
             type: String,
             default: ''
         },
-        like: {
-            type: Array,
-            default: []
-        },
-        comments: {
-            type: Array,
-            default: []
-        },
+        like: [
+            {
+              type: ObjectId,
+              ref: 'User'
+            }
+        ],
+        comments: [
+            {
+              type: ObjectId,
+              ref: 'Comment'
+            }
+        ],
         deleted: {
             type: Boolean,
             default: false

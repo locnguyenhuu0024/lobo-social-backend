@@ -19,6 +19,16 @@ const examplePost = {
     "contents": "Troi hom nay dep the"
 }
 
+const exampleComment = {
+    "author": "625cdf4d3335bf6280b14af8",
+    "title": "Chao ngay moi",
+    "pathImages": [
+        "uploads/user.png",
+        "uploads/user.png"
+    ],
+    "contents": "Troi hom nay dep the"
+}
+
 const schemaUser = Joi.object({
     lastname: Joi.string().required().max(32).min(2),
     firstname: Joi.string().required().max(32).min(2),
@@ -37,12 +47,23 @@ const schemaLoginInfo = Joi.object({
 }).with('email', 'password');
 
 const schemaPost = Joi.object({
-    author: Joi.string().required(),
+    authorID: Joi.string().required(),
     title: Joi.string(),
     pathImages: Joi.array().required(),
     contents: Joi.string(),
 });
 
+const schemaComment = Joi.object({
+    authorID: Joi.string().required(),
+    postID: Joi.string().required(),
+    image: Joi.array(),
+    content: Joi.string().required(),
+    replyTo: Joi.string(),
+});
+
 module.exports = {
-    schemaUser, schemaLoginInfo, schemaPost
+    schemaUser, 
+    schemaLoginInfo, 
+    schemaPost, 
+    schemaComment,
 };

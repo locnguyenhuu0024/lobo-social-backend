@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const ObjectId = mongoose.Schema.ObjectId;
+
 const userSchema = new mongoose.Schema(
   {
     lastname: {
@@ -51,14 +53,22 @@ const userSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
-    followers: {
+    posts: {
       type: Array,
       default: [],
     },
-    following: {
-      type: Array,
-      default: [],
-    },
+    followers: [
+      {
+        type: ObjectId,
+        ref: 'User'
+      },
+    ],
+    following: [
+      {
+        type: ObjectId,
+        ref: 'User'
+      }
+    ],
     published: {
       type: Boolean,
       default: true,

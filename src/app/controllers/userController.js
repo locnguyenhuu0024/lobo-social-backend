@@ -38,14 +38,14 @@ const userController = {
             // Check xem user bị xoá hay chưa
             const isDeletedUser = await isDeleted(userID, 'user');
 
-            if(isDeletedUser){
+            if(isDeletedUser == false){
                 // Lấy danh sách followers của user
-                const {followers} = useMongoose.mongooseToObject(
+                const {followers} = mongooseToObject(
                     await User.findById({_id: userID})
                 );
 
                 // Lấy danh sách đang theo dõi của mình
-                const {following} = useMongoose.mongooseToObject(
+                const {following} = mongooseToObject(
                     await User.findById({_id: meID})
                 );
 
@@ -60,7 +60,7 @@ const userController = {
                     // Thêm userID vào danh sách đang theo dõi của mình
                     await User.findByIdAndUpdate({_id: meID}, {$push: {following: userID}});
 
-                    res.status(200).json({message: "Đã theo dõi."})
+                    return res.status(200).json({message: "Đã theo dõi."})
                 }else{
                     // Nếu có rồi thì xoá đi
 
@@ -70,13 +70,14 @@ const userController = {
                     // Xoá id của user trong danh sách đang theo dõi của mình
                     await User.findByIdAndUpdate({_id: meID}, {$pull: {following: userID}});
 
-                    res.status(200).json({message: "Đã bỏ theo dõi."})
+                    return res.status(200).json("Đã bỏ theo dõi.")
                 }
             }else{
-                res.status(404).json({message: "Không thể tìm thấy tài khoản!"});
+                return res.status(404).json("Không thể tìm thấy tài khoản!");
             }
         } catch (error) {
-            res.status(401).json({message: "Đã có lỗi xảy ra!"});
+            console.log(error);
+            return res.status(401).json("Đã có lỗi xảy ra!");
         }
     },
 

@@ -5,7 +5,7 @@ dotenv.config();
 const middlewares = {
     verifyToken: (req, res, next) => {
         const authorizeHeader = req.headers['authorization'];
-        if(authorizeHeader){
+        if(authorizeHeader != undefined){
             const accessToken = authorizeHeader.split(" ")[1];
         
             // Kiểm tra xem có access token hay không
@@ -13,16 +13,16 @@ const middlewares = {
                 // Nếu có thì xác thực
                 const result = verifyAccessToken(accessToken);
                 if(result.error){
-                    res.status(403).json({message: "Token không hợp lệ!"});
+                    res.status(403).json("Token không hợp lệ!");
                 }else{
                     req.user = result;
                     next();
                 }
             }else{
-                res.status(401).json({message: "Access denied!"});
+                res.status(401).json("Access denied!");
             }
         }else{
-            res.status(401).json({message: "Access denied!"});
+            res.status(401).json("Access denied!");
         }
     
         
@@ -32,7 +32,7 @@ const middlewares = {
             if(req.user.username == req.params.username){
                 next();
             }else{
-                res.status(403).json({message: "Access denied!"});
+                res.status(401).json("Access denied!");
             }
         })
     },

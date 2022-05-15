@@ -28,7 +28,7 @@ const authController = {
             const hasUser = await User.findOne({email: req.body.email});
             if(hasUser){
                 return res.status(400).json(
-                    `Email ${user.email} đã tồn tại, vui lòng dùng email khác!`
+                    `Email ${hasUser.email} đã tồn tại, vui lòng dùng email khác!`
                 );
             }
             
@@ -46,6 +46,7 @@ const authController = {
                 .catch((err) => console.log(err))
             
         } catch (error) {
+            console.log(error);
             return res.status(400).json('Đã có lỗi!');            
         }
     },
@@ -55,7 +56,7 @@ const authController = {
     login: async (req, res) => {
         const dataAfterValidate = validateUserLogin(req.body);
         if(dataAfterValidate.error){
-            return res.status(400).json("Tên tài khoản hoặc mật khẩu không đúng.");
+            return res.status(401).json("Tên tài khoản hoặc mật khẩu không đúng.");
         }
         try {
             // lưu dữ liệu sau khi validate vào biến data cho gọn
@@ -73,7 +74,7 @@ const authController = {
                                 username: getUser.username
                             };
                             const refreshToken = genRefreshToken(payload);
-
+                            const accessToken = genAccessToken(payload);
                             // Lưu refresh token vao db
                             await User.findByIdAndUpdate({_id: getUser._id}, {refreshToken}, {new: true});
 
@@ -98,26 +99,27 @@ const authController = {
                                 }
                             );
                             res.status(200).json({
-                                user: user,
-                                accessToken: genAccessToken(payload)
+                                user,
+                                accessToken
                             });
                         }else{
-                            res.status(401).json({message: "Tên tài khoản hoặc mật khẩu không đúng."});
+                            return res.status(401).json("Tên tài khoản hoặc mật khẩu không đúng.");
                         }
                     }else{
-                        res.status(401).json({message: "Tài khoản chưa được kích hoạt, vui lòng kiểm tra email."});
+                        return res.status(401).json("Tài khoản chưa được kích hoạt, vui lòng kiểm tra email.");
                     }
                 }else{
-                    res.status(401).json({message: "Tài khoản không tồn tại!"});
+                    return res.status(401).json("Tài khoản không tồn tại!");
                 }
             }else{
-                res.status(401).json({message: "Tên tài khoản hoặc mật khẩu không đúng."});
+                return res.status(401).json("Tên tài khoản hoặc mật khẩu không đúng.");
             }
         } catch (error) {
             console.log(error);
-            res.status(400).json("Đã có lỗi xảy ra.");
+            return res.status(400).json("Đã có lỗi xảy ra.");
         }
     },
+
 
     // [POST] /auth/verify/:id
     verifyUser: (req, res) => {
@@ -134,61 +136,60 @@ const authController = {
     },
 
     // [POST] /auth/refresh-token
-    refreshToken: (req, res) => {
+    refreshToken: async (req, res) => {
         const refreshToken = req.cookies.refreshToken;
         const userID = req.cookies.userID;
 
-        console.log(refreshToken);
         if(!refreshToken){
-            res.status(200).json({message: "Bạn không được xác thực!"});
-        }else{
-            User.findById({_id: userID})
-            .then(user => {
-                const payloadRefreshToken = verifyRefreshToken(refreshToken);
-                if(payloadRefreshToken.error){
-                    res.status(401).json("Lỗi xác thực!");
-                }else{
-                    if(user._id == payloadRefreshToken.id){
-                        const newAccessToken = genAccessToken(payloadRefreshToken);
-                        const newRefreshToken = genRefreshToken(payloadRefreshToken);
+            return res.status(401).json("Bạn không được xác thực!");
+        }
+        try {
+            const user = await User.findById({_id: userID});
+            const payloadRefreshToken = verifyRefreshToken(refreshToken);
+            if(payloadRefreshToken.error){
+                res.status(401).json("Lỗi xác thực!");
+            }else{
+                if(user._id == payloadRefreshToken.id){
+                    const newAccessToken = genAccessToken(payloadRefreshToken);
+                    const newRefreshToken = genRefreshToken(payloadRefreshToken);
 
-                        if(user.refreshToken == refreshToken){
+                    if(user.refreshToken == refreshToken){
 
-                            // Lưu refresh token vao db
-                            User.findByIdAndUpdate({_id: user._id}, {refreshToken}, {new: true});
-                            
-                            res.cookie(
-                                'refreshToken', 
-                                newRefreshToken,
-                                {
-                                    httpOnly: true,
-                                    secure: false,
-                                    path: '/',
-                                    sameSite: 'strict',
-                                }
-                            );
-                            res.cookie(
-                                'userID', 
-                                user._id,
-                                {
-                                    httpOnly: true,
-                                    secure: false,
-                                    path: '/',
-                                    sameSite: 'strict',
-                                }
-                            );
-                            res.status(200).json({
-                                accessToken: newAccessToken
-                            });
-                        }else{
-                            res.status(401).json("Refresh Token không hợp lệ!")
-                        }
+                        // Lưu refresh token vao db
+                        await User.findByIdAndUpdate({_id: user._id}, {refreshToken: newRefreshToken}, {new: true});
+                        
+                        res.cookie(
+                            'refreshToken', 
+                            newRefreshToken,
+                            {
+                                httpOnly: true,
+                                secure: false,
+                                path: '/',
+                                sameSite: 'strict',
+                            }
+                        );
+                        res.cookie(
+                            'userID', 
+                            user._id,
+                            {
+                                httpOnly: true,
+                                secure: false,
+                                path: '/',
+                                sameSite: 'strict',
+                            }
+                        );
+                        res.status(200).json({
+                            accessToken: newAccessToken
+                        });
                     }else{
-                        res.status(401).json("Lỗi xác thực!");
+                        res.status(401).json("Refresh Token không hợp lệ!")
                     }
+                }else{
+                    res.status(401).json("Lỗi xác thực!");
                 }
-            })
-            .catch(err => console.log(err))
+            }
+        } catch (error) {
+            return res.status(401).json("Bạn không được xác thực!");
         }
     },
     
@@ -196,7 +197,7 @@ const authController = {
     logout: (req, res) => {
         res.clearCookie('refreshToken');
         res.clearCookie('userID');
-        res.status(200).json({message: "Bạn đã đăng xuất!"})
+        res.status(200).json("Bạn đã đăng xuất!")
     }
 }
 

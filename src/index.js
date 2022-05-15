@@ -12,6 +12,11 @@ const cookieParser = require('cookie-parser');
 const port = 4000;
 
 // Middlewares
+
+// Check cookie
+app.use(cors({ origin: true, credentials: true }));
+app.use(cookieParser());
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(
   express.urlencoded({
@@ -21,8 +26,6 @@ app.use(
 app.use(express.json());
 app.use(morgan('combined'));
 app.use(methodOverride('_method'));
-app.use(cors());
-app.use(cookieParser());
 
 // Setup view engine
 app.engine(
@@ -39,6 +42,9 @@ app.set('views', path.join(__dirname, 'resources', 'views'));
 
 db.connect();
 route(app);
+
+
+
 
 app.listen(port, () => {
     console.log(`App listening on port ${port}`);
