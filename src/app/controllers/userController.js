@@ -3,6 +3,10 @@ const {
     mongooseToObject,
     isDeleted,
 } = require('../util/mongoose');
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
+const Post = require('../models/Post');
+const {validateUpdateInfo} = require('../validation');
 
 const userController = {
     // [GET] /user/:username
@@ -17,14 +21,107 @@ const userController = {
                 // Lấy thông tin của người dùng, loại trừ password và refreshToken.
                 // Sau đó gửi thông tin còn lại về client.
 
-                const {password, refreshToken, ...user} 
-                    = mongooseToObject(await User.findById({_id: userID}));
-                res.status(200).json(user);
+                // const {password, refreshToken, ...user} 
+                //     = mongooseToObject(await User.findById({_id: userID}));
+
+                const user = await User.aggregate()
+                .match({'_id': new ObjectId(userID)})
+                .project({'password': 0, 'refreshToken': 0})
+                .lookup({
+                    from: 'users',
+                    localField: 'following',
+                    foreignField: '_id',
+                    pipeline: [
+                        {$project: {
+                            'firstname': 1, 
+                            'lastname': 1, 
+                            'userImage': 1, 
+                            '_id': 1
+                        }}
+                    ],
+                    as: 'following'
+                })
+                .lookup({
+                    from: 'users',
+                    localField: 'followers',
+                    foreignField: '_id',
+                    pipeline: [
+                        {$project: {
+                            'firstname': 1, 
+                            'lastname': 1, 
+                            'userImage': 1, 
+                            '_id': 1
+                        }}
+                    ],
+                    as: 'followers'
+                })
+
+                const posts = await Post.aggregate()
+                .match({'authorID': new ObjectId(userID)})
+                .lookup({
+                    from: 'users',
+                    localField: 'authorID',
+                    foreignField: '_id',
+                    as: 'author',
+                    pipeline: [
+                        {$project: {
+                            'firstname': 1, 
+                            'lastname': 1, 
+                            'userImage': 1, 
+                            '_id': 0
+                        }}
+                    ]
+                })
+                .lookup({
+                    from: 'users',
+                    localField: 'like',
+                    foreignField: '_id',
+                    pipeline: [
+                        {$project: {
+                            'firstname': 1, 
+                            'lastname': 1, 
+                            'userImage': 1, 
+                            '_id': 1
+                        }}
+                    ],
+                    as: 'like'
+                })
+
+                user[0].posts = posts;
+                
+
+                res.status(200).json(user[0]);
             }else{
-                res.status(404).json({message: "Không thể tìm thấy tài khoản!"});
+                res.status(404).json("Không thể tìm thấy tài khoản!");
             }
         } catch (error) {
-            res.status(401).json({message: "Đã có lỗi xảy ra!"});
+            console.log(error);
+            res.status(401).json("Đã có lỗi xảy ra!");
+        }
+    },
+
+    // [GET] /user/follow/
+    loadFollow: async (req, res) => {
+        const id = req.user.id;
+        try {
+            const list = await User.aggregate()
+            .match({'_id': new ObjectId(id)})
+            .lookup({
+                from: 'users',
+                localField: 'following',
+                foreignField: '_id',
+                pipeline: [
+                    {$project: {'firstname': 1, 'lastname': 1, 'userImage': 1, '_id': 1}}
+                ],
+                as: 'following'
+            })
+
+            const {following} = list[0];
+
+            res.status(201).json(following)
+        } catch (error) {
+            res.status(400).json('Đã có lỗi xảy ra.');
+            console.log(error);
         }
     },
 
@@ -43,15 +140,24 @@ const userController = {
                 const {followers} = mongooseToObject(
                     await User.findById({_id: userID})
                 );
+                // u = userID in list like
+                const stringFollowers = followers.map(u => u.toString());
 
                 // Lấy danh sách đang theo dõi của mình
                 const {following} = mongooseToObject(
                     await User.findById({_id: meID})
                 );
+                // u = userID in list like
+                const stringFollowing = following.map(u => u.toString());
+
 
                 // Check xem có tồn tại userID và meID 
                 // trong hai danh sách following và followers chưa
-                if(followers.includes(meID) == false && following.includes(userID) == false){
+                if(
+                    stringFollowers.includes(meID) 
+                    == false && stringFollowing.includes(userID) 
+                    == false
+                ){
                     // Nếu chưa thì thêm vào
 
                     // Thêm meID vào danh sách người theo dõi của user kia
@@ -91,29 +197,75 @@ const userController = {
             // Check xem user bị xoá hay chưa
             const isDeletedUser = await isDeleted(userID, 'user');
 
-            if(isDeletedUser){
+            if(isDeletedUser == false){
                 const {blockList} = mongooseToObject(
                     await User.findById({_id: meID})
                 );
-                if(blockList.includes(userID) == false){
+                // u = userID in list like
+                const stringBlocklist = blockList.map(u => u.toString());
+                if(stringBlocklist.includes(userID) == false){
                     await User.findByIdAndUpdate(
                         {_id: meID}, 
                         {$push: {blockList: userID}}
                     );
-                    res.status(200).json({message: "Đã chặn người dùng."});
+                    
+                    // Xoá id của mình trong danh sách người theo dõi của user
+                    await User.findByIdAndUpdate({_id: userID}, {$pull: {followers: meID}});
+
+                    // Xoá id của user trong danh sách đang theo dõi của mình
+                    await User.findByIdAndUpdate({_id: meID}, {$pull: {following: userID}});
+                    res.status(200).json("Đã chặn người dùng.");
                 }else{
                     await User.findByIdAndUpdate(
                         {_id: meID}, 
                         {$pull: {blockList: userID}}
                     );
-                    res.status(200).json({message: "Đã bỏ chặn người dùng."});
+                    res.status(200).json("Đã bỏ chặn người dùng.");
                 }
             }else{
-                res.status(404).json({message: "Không thể tìm thấy tài khoản!"});
+                res.status(404).json("Không thể tìm thấy tài khoản!");
             }
         } catch (error) {
             console.log(error);
-            res.status(401).json({message: "Đã có lỗi xảy ra!"});
+            res.status(401).json("Đã có lỗi xảy ra!");
+        }
+    },
+
+    // [GET] /find/?name=...
+    find: async (req, res) => {
+        try {
+            const name = (req.query.name);
+            
+            const listUser = await User.aggregate()
+            .match({$text: {$search: name}})
+            .match({'_id': {$ne: req.user.id}})
+            .project({lastname: 1, firstname: 1, userImage: 1, _id: 1, followers: 1})
+
+            res.status(200).json(listUser);
+        } catch (error) {
+            console.log('find error');
+            console.log(error);
+            res.status(400).json('Đã có lỗi xảy ra!');
+        }
+    },
+
+    // [PATCH] /update/
+    update: async (req, res) => {
+        try {
+            const {body} = req;
+            const userID = req.user.id;
+            const {error, value} = validateUpdateInfo(body);
+            if(!error){
+                console.log(userID);
+                await User.findByIdAndUpdate({'_id': userID}, {$set: value});
+                res.status(200).json('Cập nhật thành công!');
+            }else{
+                res.status(400).json('Đã có lỗi xảy ra!');
+                console.log(error);
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(400).json('Đã có lỗi xảy ra!');
         }
     }
 }

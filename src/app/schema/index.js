@@ -36,7 +36,7 @@ const schemaUser = Joi.object({
         minDomainSegments: 2, tlds: { allow: ['com', 'net'] } 
     }).required(),
     password: Joi.string().pattern(/^[a-zA-Z0-9]{8,16}$/).required(),
-    
+    userImage: Joi.string().required().min(20),
 }).with('email', 'password');
 
 const schemaLoginInfo = Joi.object({
@@ -61,9 +61,25 @@ const schemaComment = Joi.object({
     replyTo: Joi.string(),
 });
 
+const schemaUpdateInfo = Joi.object({
+    lastname: Joi.string().required().max(32).min(2),
+    firstname: Joi.string().required().max(32).min(2),
+    bio: Joi.string().max(150).min(0),
+    email: Joi.string().email({
+        minDomainSegments: 2, tlds: { allow: ['com', 'net'] } 
+    }),
+});
+
+const schemaUpdatePost = Joi.object({
+    pathImages: Joi.array().required(),
+    contents: Joi.string(),
+});
+
 module.exports = {
     schemaUser, 
     schemaLoginInfo, 
     schemaPost, 
     schemaComment,
+    schemaUpdateInfo,
+    schemaUpdatePost
 };

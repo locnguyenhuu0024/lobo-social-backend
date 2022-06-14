@@ -106,7 +106,7 @@ var message = (data) =>  {
                                   </tr>
                                   <tr>
                                     <td valign="top" width="48%" align="center"> 
-                                        <form id="verifyform" method="POST" action="http://localhost:4000/auth/verify/${data.id}?_method=PUT">
+                                        <form id="verifyform" method="POST" action="http://localhost:4000/api/auth/verify/${data.id}?_method=PUT">
                                           
                                             <button type="submit" style="display:block; cursor: pointer; padding:15px 25px; background-color:#0c0c0d; color:#ffffff; border-radius:3px; text-decoration:none; border: none; width: 100%; font-weight: bold;">Xác nhận địa chỉ Email</button>
                                           

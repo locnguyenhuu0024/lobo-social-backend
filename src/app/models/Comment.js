@@ -31,7 +31,7 @@ const commentSchema = new mongoose.Schema(
             type: ObjectId,
             ref: 'Comment',
             default: null
-        }
+        },
     }, { timestamps: true }
 );
 

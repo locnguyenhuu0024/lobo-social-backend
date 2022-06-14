@@ -5,17 +5,17 @@ const meController = require('../app/controllers/meController');
 
 
 router.patch(
-    '/update/:username', 
+    '/update/', 
     middlewares.verifyTokenAndMeAuth, 
     meController.updateInfo
 );
 router.delete(
-    '/delete/:username', 
+    '/delete/', 
     middlewares.verifyTokenAndMeAuth, 
     meController.deleteUser
 );
 router.get(
-    '/:username', 
+    '/', 
     middlewares.verifyTokenAndMeAuth, 
     meController.getInfo
 );

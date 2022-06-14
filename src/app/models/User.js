@@ -16,11 +16,15 @@ const userSchema = new mongoose.Schema(
       maxlength: 32,
       minlength: 2
     },
+    bio: {
+      type: String,
+      maxlength: 150,
+      minlength: 2
+    },
     email: {
       type: String,
       required: true,
       trim: true,
-      index: { unique: true },
       match: /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
     },
     password: {
@@ -80,10 +84,20 @@ const userSchema = new mongoose.Schema(
     blockList: {
       type: Array,
       default: []
+    },
+    googleID: {
+      type: String,
+      default: null,
+    },
+    facebookID: {
+      type: String,
+      default: null
     }
   },
   { timestamps: true }
 );
+
+userSchema.index({firstname: 'text', lastname: 'text'});
 
 const userModel = mongoose.model("users", userSchema);
 module.exports = userModel;

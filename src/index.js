@@ -8,12 +8,14 @@ const methodOverride = require('method-override');
 const { engine } = require('express-handlebars');
 const cors = require('cors')
 const cookieParser = require('cookie-parser');
+const socketIO = require('./app/util/socketio');
 
 const port = 4000;
 
 // Middlewares
 
 // Check cookie
+// Chèn url của front-end vào đây
 app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 
@@ -40,13 +42,17 @@ app.engine(
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'resources', 'views'));
 
+// Setup Socket.io
+const server = require('http').createServer(app);
+app.set('socketio', socketIO(server)); // Gắn socketio vào app để dùng ở các route
+
 db.connect();
 route(app);
 
 
 
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`App listening on port ${port}`);
 });
 

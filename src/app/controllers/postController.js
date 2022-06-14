@@ -1,18 +1,15 @@
 const {
-    mongooseSaveModel,
-    isDeleted,
     mongooseToObject,
-    multipleMongooseToObject
 } = require('../util/mongoose');
 const {
-    validatePost
-} = require('../validation')
+    validatePost, validateUpdatePost
+} = require('../validation');
 const Post = require('../models/Post');
 const User = require('../models/User');
+const notifyController = require('./notifyController');
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 
-const getPosts = async () => {
-    
-}
 
 const postController = {
     // [POST] /post/
@@ -28,9 +25,11 @@ const postController = {
             contents: req.body.postContents,
             pathImages: imageFiles
         };
-
+        
         const {error, value} = validatePost(body);
         if(error){
+            console.log(1);
+            console.log(error.details[0].message);
             return res.status(400).json(error.details[0].message);
         }
 
@@ -84,9 +83,12 @@ const postController = {
             const user = await User.findById({_id: userID});
 
             const posts = await Post.aggregate()
-            .match({'$or':[
+            .match({$and: [
+                {'$or':[
                 {'authorID': user._id}, 
                 {'authorID': {'$in': user.following}}
+                ]},
+                {'deleted': false}
             ]})
             .lookup({
                 from: 'users',
@@ -136,6 +138,7 @@ const postController = {
     love: async (req, res) => {
         const idPost = req.params.idPost;
         const idUser = req.user.id;
+        const io = req.app.get('socketio');
 
         try {
             const {_id, like} = mongooseToObject(
@@ -145,8 +148,9 @@ const postController = {
             // Hàm lấy post sau khi like hoặc unlike
             const getNewPost = async () => {
                 const newPost = await Post.aggregate()
-                .match({'$or':[
+                .match({'$and':[
                     {'_id': _id},
+                    {'deleted': false}
                 ]})
                 .lookup({
                     from: 'users',
@@ -161,6 +165,20 @@ const postController = {
                         }}
                     ],
                     as: 'like'
+                })
+                .lookup({
+                    from: 'users',
+                    localField: 'authorID',
+                    foreignField: '_id',
+                    pipeline: [
+                        {$project: {
+                            'firstname': 1, 
+                            'lastname': 1, 
+                            'userImage': 1, 
+                            '_id': 1
+                        }}
+                    ],
+                    as: 'author'
                 });
                 return newPost;
             }
@@ -175,7 +193,38 @@ const postController = {
                     {$push: {like: idUser}}
                 );
                 const newPost = await getNewPost();
-                console.log(newPost);
+
+                // Send thông báo có người thích bài đăng
+                // Lấy thông tin người bấm thích
+                const getUser = mongooseToObject(
+                    await User.findById({'_id': new ObjectId(idUser)})
+                );
+                const author = {
+                    userImage: getUser.userImage,
+                    firstname: getUser.firstname,
+                    lastname: getUser.lastname,
+                    _id: getUser._id
+                }
+                console.log(newPost[0].authorID);
+                console.log(author._id);
+                if(author._id.toString() != newPost[0].authorID.toString()){
+                    notifyController.sendNotify(
+                        io, 
+                        'LOVE_POST', 
+                        author, 
+                        newPost[0].authorID
+                    );
+
+                    notifyController.saveNotify(
+                        'LOVE_POST', 
+                        author, 
+                        {
+                            from: author._id,
+                            to: newPost[0].authorID, 
+                            postID: newPost[0]._id, 
+                        }
+                    )
+                }
                 return res.status(201).json(newPost);
             }else{
                 await Post.findByIdAndUpdate(
@@ -183,13 +232,87 @@ const postController = {
                     {$pull: {like: idUser}}
                 );
                 const newPost = await getNewPost();
-                console.log(newPost);
+
                 return res.status(201).json(newPost);
             }
         } catch (error) {
             console.log(error);
             return res.status(401).json("Đã có lỗi xảy ra!");
         }
+    }, 
+
+    getPost: async (req, res) => {
+        const idPost = req.params.id;
+        try {
+            const post = await Post.aggregate()
+            .match({$and: [{'_id': new ObjectId(idPost)}, {'deleted': false}]})
+            .lookup({
+                from: 'users',
+                localField: 'authorID',
+                foreignField: '_id',
+                as: 'author',
+                pipeline: [
+                    {$project: {
+                        'firstname': 1, 
+                        'lastname': 1, 
+                        'userImage': 1, 
+                        '_id': 1
+                    }}
+                ]
+            })
+            .lookup({
+                from: 'users',
+                localField: 'like',
+                foreignField: '_id',
+                pipeline: [
+                    {$project: {
+                        'firstname': 1, 
+                        'lastname': 1, 
+                        'userImage': 1, 
+                        '_id': 1
+                    }}
+                ],
+                as: 'like'
+            })
+
+            res.status(200).json(post[0]);
+        } catch (error) {
+            console.log(error);
+            res.status(400).json('Có lỗi xảy ra!');
+        }
+    },
+
+    update: async (req, res) => {
+        try {
+            const {body} = req;
+            const {idPost} = req.params;
+            const {error, value} = validateUpdatePost(body);
+            if(value){
+                await Post.findByIdAndUpdate({'_id': idPost}, {$set: value});
+                return res.status(200).json('Cập nhật bài đăng thành công!');
+            }else{
+                console.log(error);
+                return res.status(400).json('Có lỗi xảy ra!');
+            }
+        } catch (error) {
+            console.log(error);
+            return res.status(400).json('Có lỗi xảy ra!');
+        }
+    },
+
+    delete: async (req, res) => {
+        try {
+            const {idPost} = req.params;
+            await Post.findByIdAndUpdate({'_id': idPost}, {$set: {'deleted': true}});
+            return res.status(200).json('Xoá bài đăng thành công!');
+        } catch (error) {
+            console.log(error);
+            return res.status(400).json('Có lỗi xảy ra!');
+        }
+    },
+
+    loadExplore: async (req, res) => {
+        
     }
 };
 

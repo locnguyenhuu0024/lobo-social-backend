@@ -104,4 +104,4 @@ dist
 .tern-port
 
 # Files in /public/uploads
-./src/public/uploads/
+/src/public/uploads/

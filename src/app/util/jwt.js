@@ -4,7 +4,7 @@ dotenv.config();
 const moment = require('moment');
 
 const optionAccessToken = {
-    expiresIn: '30s',
+    expiresIn: '2h',
     algorithm: 'HS256',
     audience: process.env.JWT_AUDIENCE,
     subject: process.env.JWT_SUBJECT
