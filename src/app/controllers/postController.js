@@ -205,8 +205,8 @@ const postController = {
                     lastname: getUser.lastname,
                     _id: getUser._id
                 }
-                console.log(newPost[0].authorID);
-                console.log(author._id);
+                // console.log(newPost[0].authorID);
+                // console.log(author._id);
                 if(author._id.toString() != newPost[0].authorID.toString()){
                     notifyController.sendNotify(
                         io, 

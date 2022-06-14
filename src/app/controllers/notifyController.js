@@ -33,7 +33,7 @@ const notifyController = {
                         ${from.lastname}
                         vừa thích bài đăng của bạn.
                     `;
-                    console.log(data);
+                    //console.log(data);
                     const notify = new Notify(data);
                     await mongooseSaveModel(notify);
                 } break;

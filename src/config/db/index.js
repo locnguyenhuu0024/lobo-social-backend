@@ -9,6 +9,7 @@ async function connect() {
     await mongoose.connect(process.env.DB_URL);
     console.log('Connect successfully');
   } catch (error) {
+    console.log(error);
     console.log('Connect failure');
   }
 }
