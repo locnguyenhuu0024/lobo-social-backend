@@ -16,7 +16,10 @@ const port = 4000;
 
 // Check cookie
 // Chèn url của front-end vào đây
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({ 
+  origin: "https://lobo.today", 
+  credentials: true 
+}));
 app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'public')));
