@@ -95,7 +95,7 @@ const authController = {
                                     httpOnly: true,
                                     secure: true,
                                     path: '/',
-                                    //sameSite: 'strict',
+                                    sameSite: 'none',
                                 }
                             );
                             res.cookie(
@@ -105,7 +105,7 @@ const authController = {
                                     httpOnly: true,
                                     secure: true,
                                     path: '/',
-                                    //sameSite: 'strict',
+                                    sameSite: 'none',
                                 }
                             );
                             res.status(200).json({
@@ -179,7 +179,7 @@ const authController = {
                                 httpOnly: true,
                                 secure: true,
                                 path: '/',
-                                //sameSite: 'strict',
+                                sameSite: 'none',
                             }
                         );
                         res.cookie(
@@ -189,7 +189,7 @@ const authController = {
                                 httpOnly: true,
                                 secure: true,
                                 path: '/',
-                                //sameSite: 'strict',
+                                sameSite: 'none',
                             }
                         );
                         res.status(200).json({
@@ -242,7 +242,7 @@ const authController = {
                         httpOnly: true,
                         secure: true,
                         path: '/',
-                        //sameSite: 'strict',
+                        sameSite: 'none',
                     }
                 );
                 res.cookie(
@@ -252,7 +252,7 @@ const authController = {
                         httpOnly: true,
                         secure: true,
                         path: '/',
-                        //sameSite: 'strict',
+                        sameSite: 'none',
                     }
                 );
                 res.status(200).json({
@@ -286,7 +286,7 @@ const authController = {
                         httpOnly: true,
                         secure: true,
                         path: '/',
-                        //sameSite: 'strict',
+                        sameSite: 'none',
                     }
                 );
                 res.cookie(
@@ -296,7 +296,7 @@ const authController = {
                         httpOnly: true,
                         secure: true,
                         path: '/',
-                        //sameSite: 'strict',
+                        sameSite: 'none',
                     }
                 );
                 res.status(200).json({
@@ -344,7 +344,7 @@ const authController = {
                         httpOnly: true,
                         secure: true,
                         path: '/',
-                        //sameSite: 'strict',
+                        sameSite: 'none',
                     }
                 );
                 res.cookie(
@@ -354,7 +354,7 @@ const authController = {
                         httpOnly: true,
                         secure: true,
                         path: '/',
-                        //sameSite: 'strict',
+                        sameSite: 'none',
                     }
                 );
                 res.status(200).json({
@@ -388,7 +388,7 @@ const authController = {
                         httpOnly: true,
                         secure: true,
                         path: '/',
-                        //sameSite: 'strict',
+                        sameSite: 'none',
                     }
                 );
                 res.cookie(
@@ -398,7 +398,7 @@ const authController = {
                         httpOnly: true,
                         secure: true,
                         path: '/',
-                        //sameSite: 'strict',
+                        sameSite: 'none',
                     }
                 );
                 res.status(200).json({
