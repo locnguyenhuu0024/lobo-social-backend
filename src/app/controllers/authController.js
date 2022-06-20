@@ -93,7 +93,7 @@ const authController = {
                                 refreshToken,
                                 {
                                     httpOnly: true,
-                                    secure: false,
+                                    secure: true,
                                     path: '/',
                                     //sameSite: 'strict',
                                 }
@@ -103,7 +103,7 @@ const authController = {
                                 getUser._id,
                                 {
                                     httpOnly: true,
-                                    secure: false,
+                                    secure: true,
                                     path: '/',
                                     //sameSite: 'strict',
                                 }
@@ -177,7 +177,7 @@ const authController = {
                             newRefreshToken,
                             {
                                 httpOnly: true,
-                                secure: false,
+                                secure: true,
                                 path: '/',
                                 //sameSite: 'strict',
                             }
@@ -187,7 +187,7 @@ const authController = {
                             user._id,
                             {
                                 httpOnly: true,
-                                secure: false,
+                                secure: true,
                                 path: '/',
                                 //sameSite: 'strict',
                             }
@@ -240,7 +240,7 @@ const authController = {
                     refreshToken,
                     {
                         httpOnly: true,
-                        secure: false,
+                        secure: true,
                         path: '/',
                         //sameSite: 'strict',
                     }
@@ -250,7 +250,7 @@ const authController = {
                     user._id,
                     {
                         httpOnly: true,
-                        secure: false,
+                        secure: true,
                         path: '/',
                         //sameSite: 'strict',
                     }
@@ -284,7 +284,7 @@ const authController = {
                     refreshToken,
                     {
                         httpOnly: true,
-                        secure: false,
+                        secure: true,
                         path: '/',
                         //sameSite: 'strict',
                     }
@@ -294,7 +294,7 @@ const authController = {
                     user._id,
                     {
                         httpOnly: true,
-                        secure: false,
+                        secure: true,
                         path: '/',
                         //sameSite: 'strict',
                     }
@@ -342,7 +342,7 @@ const authController = {
                     refreshToken,
                     {
                         httpOnly: true,
-                        secure: false,
+                        secure: true,
                         path: '/',
                         //sameSite: 'strict',
                     }
@@ -352,7 +352,7 @@ const authController = {
                     user._id,
                     {
                         httpOnly: true,
-                        secure: false,
+                        secure: true,
                         path: '/',
                         //sameSite: 'strict',
                     }
@@ -386,7 +386,7 @@ const authController = {
                     refreshToken,
                     {
                         httpOnly: true,
-                        secure: false,
+                        secure: true,
                         path: '/',
                         //sameSite: 'strict',
                     }
@@ -396,7 +396,7 @@ const authController = {
                     user._id,
                     {
                         httpOnly: true,
-                        secure: false,
+                        secure: true,
                         path: '/',
                         //sameSite: 'strict',
                     }
