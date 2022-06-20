@@ -9,7 +9,6 @@ const { engine } = require('express-handlebars');
 const cors = require('cors')
 const cookieParser = require('cookie-parser');
 const socketIO = require('./app/util/socketio');
-const config = require('config');
 
 const port = 4000;
 
@@ -18,7 +17,7 @@ const port = 4000;
 // Check cookie
 // Chèn url của front-end vào đây
 app.use(cors({ 
-  origin: config.get("https://lobo.today"), 
+  origin: "https://lobo.today", 
   credentials: true 
 }));
 app.use(cookieParser());
