@@ -34,13 +34,14 @@ const middlewares = {
         middlewares.verifyToken(req, res, async () => {
             try {
                 const result = verifyRefreshToken(req.cookies.refreshToken);
-                if(req.user.id == result.id){
-                    next();
-                }else{
-                    console.log(result.error);
-                    return res.status(401).json("Access denied!");
-                }
-                
+                setTimeout(() => {
+                    if(req.user.id == result.id){
+                        next();
+                    }else{
+                        console.log(result.error);
+                        return res.status(401).json("Access denied!");
+                    }
+                }, 1000)
             } catch (error) {
                 console.log(error);
                 return res.status(401).json("Access denied!");
