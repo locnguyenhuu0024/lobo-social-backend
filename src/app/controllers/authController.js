@@ -96,6 +96,7 @@ const authController = {
                                     secure: true,
                                     path: '/',
                                     sameSite: 'none',
+                                    maxAge: 345600000,
                                 }
                             );
                             res.cookie(
@@ -106,6 +107,7 @@ const authController = {
                                     secure: true,
                                     path: '/',
                                     sameSite: 'none',
+                                    maxAge: 345600000,
                                 }
                             );
                             res.status(200).json({
@@ -180,6 +182,7 @@ const authController = {
                                 secure: true,
                                 path: '/',
                                 sameSite: 'none',
+                                maxAge: 345600000,
                             }
                         );
                         res.cookie(
@@ -190,6 +193,7 @@ const authController = {
                                 secure: true,
                                 path: '/',
                                 sameSite: 'none',
+                                maxAge: 345600000,
                             }
                         );
                         res.status(200).json({
@@ -243,6 +247,7 @@ const authController = {
                         secure: true,
                         path: '/',
                         sameSite: 'none',
+                        maxAge: 345600000,
                     }
                 );
                 res.cookie(
@@ -253,6 +258,7 @@ const authController = {
                         secure: true,
                         path: '/',
                         sameSite: 'none',
+                        maxAge: 345600000,
                     }
                 );
                 res.status(200).json({
@@ -287,6 +293,7 @@ const authController = {
                         secure: true,
                         path: '/',
                         sameSite: 'none',
+                        maxAge: 345600000,
                     }
                 );
                 res.cookie(
@@ -297,6 +304,7 @@ const authController = {
                         secure: true,
                         path: '/',
                         sameSite: 'none',
+                        maxAge: 345600000,
                     }
                 );
                 res.status(200).json({
@@ -345,6 +353,7 @@ const authController = {
                         secure: true,
                         path: '/',
                         sameSite: 'none',
+                        maxAge: 345600000,
                     }
                 );
                 res.cookie(
@@ -355,6 +364,7 @@ const authController = {
                         secure: true,
                         path: '/',
                         sameSite: 'none',
+                        maxAge: 345600000,
                     }
                 );
                 res.status(200).json({
@@ -389,6 +399,7 @@ const authController = {
                         secure: true,
                         path: '/',
                         sameSite: 'none',
+                        maxAge: 345600000,
                     }
                 );
                 res.cookie(
@@ -399,6 +410,7 @@ const authController = {
                         secure: true,
                         path: '/',
                         sameSite: 'none',
+                        maxAge: 345600000,
                     }
                 );
                 res.status(200).json({
