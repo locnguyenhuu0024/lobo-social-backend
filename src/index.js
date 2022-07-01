@@ -17,7 +17,7 @@ const port = 4000;
 // Check cookie
 // Chèn url của front-end vào đây
 app.use(cors({ 
-  origin: "https://lobo.today", 
+  origin: process.env.PRODUCTION ? "https://lobo.today" : 'http://localhost:3000', 
   credentials: true 
 }));
 app.use(cookieParser());
