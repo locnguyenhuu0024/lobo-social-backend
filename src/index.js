@@ -9,6 +9,8 @@ const { engine } = require('express-handlebars');
 const cors = require('cors')
 const cookieParser = require('cookie-parser');
 const socketIO = require('./app/util/socketio');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const port = 4000;
 
