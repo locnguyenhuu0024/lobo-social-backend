@@ -23,7 +23,7 @@ const commentController = {
             content: req.body.content
         }
 
-        console.log(body);
+        // console.log(body);
 
         const {value, error} = validateComment(body)
         if(error){
@@ -34,7 +34,7 @@ const commentController = {
             const comment = new Comment(value);
             const commentSaved = await comment.save();
 
-            console.log(commentSaved);
+            // console.log(commentSaved);
 
             const rootComment = await Comment.aggregate()
             .match({'_id': commentSaved._id})
@@ -159,7 +159,7 @@ const commentController = {
                 }
             }
 
-            console.log(rootComment);
+            // console.log(rootComment);
             // TỚI ĐÂY RỒI, 
             // DUYỆT DANH SÁCH REPLIES SAU ĐÓ PUSH VÀO CHỖ COMMENT CẦN PUSH LÀ XONG :))))
             res.status(200).json(rootComment);

@@ -28,7 +28,6 @@ const postController = {
         
         const {error, value} = validatePost(body);
         if(error){
-            console.log(1);
             console.log(error.details[0].message);
             return res.status(400).json(error.details[0].message);
         }
@@ -39,7 +38,7 @@ const postController = {
 
             const getPost = await Post.aggregate()
             .match({'_id': postSaved._id})
-            .lookup({
+            .lookup({         
                 from: 'users',
                 localField: 'authorID',
                 foreignField: '_id',
@@ -83,11 +82,9 @@ const postController = {
             const user = await User.findById({_id: userID});
 
             const posts = await Post.aggregate()
-            .match({$and: [
-                {'$or':[
+            .match({'$or':[
                 {'authorID': user._id}, 
-                {'authorID': {'$in': user.following}}
-                ]},
+                {'authorID': {'$in': user.following}},
                 {'deleted': false}
             ]})
             .lookup({
@@ -286,10 +283,53 @@ const postController = {
         try {
             const {body} = req;
             const {idPost} = req.params;
-            const {error, value} = validateUpdatePost(body);
+
+            const imageFiles = [];
+            const url = req.protocol + '://' + req.get('host');
+            for (var i = 0; i < req.files.length; i++) {
+                imageFiles.push(url + '/uploads/' + req.files[i].filename);
+            }
+
+            body.updatedPath = [...body.updatedPath.split(','), ...imageFiles];
+            const data = {
+                contents: body.postContents,
+                pathImages: body.updatedPath,
+            }
+
+            const {error, value} = validateUpdatePost(data);
             if(value){
                 await Post.findByIdAndUpdate({'_id': idPost}, {$set: value});
-                return res.status(200).json('Cập nhật bài đăng thành công!');
+                const post = await Post.aggregate()
+                .match({$and: [{'_id': new ObjectId(idPost)}, {'deleted': false}]})
+                .lookup({
+                    from: 'users',
+                    localField: 'authorID',
+                    foreignField: '_id',
+                    as: 'author',
+                    pipeline: [
+                        {$project: {
+                            'firstname': 1, 
+                            'lastname': 1, 
+                            'userImage': 1, 
+                            '_id': 1
+                        }}
+                    ]
+                })
+                .lookup({
+                    from: 'users',
+                    localField: 'like',
+                    foreignField: '_id',
+                    pipeline: [
+                        {$project: {
+                            'firstname': 1, 
+                            'lastname': 1, 
+                            'userImage': 1, 
+                            '_id': 1
+                        }}
+                    ],
+                    as: 'like'
+                })
+                return res.status(200).json({msg: 'Cập nhật bài đăng thành công!', data: post[0]});
             }else{
                 console.log(error);
                 return res.status(400).json('Có lỗi xảy ra!');

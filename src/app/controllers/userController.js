@@ -57,7 +57,7 @@ const userController = {
                 })
 
                 const posts = await Post.aggregate()
-                .match({'authorID': new ObjectId(userID)})
+                .match({$and: [{'authorID': new ObjectId(userID)}, {'deleted': false}]})
                 .lookup({
                     from: 'users',
                     localField: 'authorID',
@@ -256,7 +256,6 @@ const userController = {
             const userID = req.user.id;
             const {error, value} = validateUpdateInfo(body);
             if(!error){
-                console.log(userID);
                 await User.findByIdAndUpdate({'_id': userID}, {$set: value});
                 res.status(200).json('Cập nhật thành công!');
             }else{

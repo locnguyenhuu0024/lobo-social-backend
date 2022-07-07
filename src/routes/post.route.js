@@ -5,7 +5,12 @@ const postController = require('../app/controllers/postController');
 const uploadMulter = require('../app/util/multer')
 
 
-router.patch('/update/:idPost', verifyTokenAndMeAuth, postController.update);
+router.patch(
+    '/update/:idPost', 
+    verifyTokenAndMeAuth, 
+    uploadMulter.array('postImages', 8), 
+    postController.update
+);
 router.delete('/delete/:idPost', verifyTokenAndMeAuth, postController.delete);
 router.put('/love/:idPost', verifyToken, postController.love);
 router.get('/:id', verifyToken, postController.getPost);

@@ -106,7 +106,11 @@ var message = (data) =>  {
                                   </tr>
                                   <tr>
                                     <td valign="top" width="48%" align="center"> 
-                                        <form id="verifyform" method="POST" action="http://localhost:4000/api/auth/verify/${data.id}?_method=PUT">
+                                        <form id="verifyform" method="POST" action="${
+                                            process.env.PRODUCTION 
+                                            ? 'https://lobosocial.me' 
+                                            : 'http://localhost:4000'
+                                        }/api/auth/verify/${data.id}?_method=PUT">
                                           
                                             <button type="submit" style="display:block; cursor: pointer; padding:15px 25px; background-color:#0c0c0d; color:#ffffff; border-radius:3px; text-decoration:none; border: none; width: 100%; font-weight: bold;">Xác nhận địa chỉ Email</button>
                                           
@@ -154,7 +158,11 @@ var message = (data) =>  {
                           </tr>
                           <tr>
                             <td valign="top" align="center"> <span style="font-family: -apple-system,BlinkMacSystemFont,&#39;Segoe UI&#39;,&#39;Roboto&#39;,&#39;Oxygen&#39;,&#39;Ubuntu&#39;,&#39;Cantarell&#39;,&#39;Fira Sans&#39;,&#39;Droid Sans&#39;,&#39;Helvetica Neue&#39;,sans-serif; color:#9EB0C9; font-size:10px;">&copy;
-                              <a href="#" target="_blank" style="color:#9EB0C9 !important; text-decoration:none;">Lobo Social</a> 2022
+                              <a href="${
+                                process.env.PRODUCTION 
+                                ? 'https://lobo.today' 
+                                : 'http://localhost:3000'
+                              }/login" target="_blank" style="color:#9EB0C9 !important; text-decoration:none;">Lobo Social</a> 2022
                             </span>
   
                             </td>

@@ -97,7 +97,7 @@ const notifyController = {
     getNotify: async (req, res) => {
         try {
             const userID = req.user.id;
-            console.log(userID);
+            // console.log(userID);
             const getNotify = await Notify.aggregate()
             .match({'to': new ObjectId(userID)})
             .lookup({
