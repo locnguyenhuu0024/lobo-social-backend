@@ -290,7 +290,10 @@ const postController = {
                 imageFiles.push(url + '/uploads/' + req.files[i].filename);
             }
 
-            body.updatedPath = [...body.updatedPath.split(','), ...imageFiles];
+            body.updatedPath = body.updatedPath 
+            ? [...body.updatedPath.split(','), ...imageFiles] 
+            : [...imageFiles];
+            
             const data = {
                 contents: body.postContents,
                 pathImages: body.updatedPath,
