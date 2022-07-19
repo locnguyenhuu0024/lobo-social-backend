@@ -82,10 +82,11 @@ const postController = {
             const user = await User.findById({_id: userID});
 
             const posts = await Post.aggregate()
-            .match({'$or':[
-                {'authorID': user._id}, 
-                {'authorID': {'$in': user.following}},
-                {'deleted': false}
+            .match({'$and': [
+                {'deleted': false}, 
+                {'$or': [
+                    {'authorID': user._id}, {'authorID': {$in: user.following}}
+                ]}
             ]})
             .lookup({
                 from: 'users',
