@@ -235,11 +235,12 @@ const userController = {
     find: async (req, res) => {
         try {
             const name = (req.query.name);
+            const user = await User.findById({_id: req.user.id});
             
             const listUser = await User.aggregate()
             .match({$and: [
                 {$text: {$search: name}},
-                {'_id': {$ne: new ObjectId(req.user.id)}}
+                {'_id': {$nin: user.blockList}}
             ]})
             .project({lastname: 1, firstname: 1, userImage: 1, _id: 1, followers: 1})
 
