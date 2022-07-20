@@ -237,8 +237,10 @@ const userController = {
             const name = (req.query.name);
             
             const listUser = await User.aggregate()
-            .match({$text: {$search: name}})
-            .match({'_id': {$ne: new ObjectId(req.user.id)}})
+            .match({$and: [
+                {$text: {$search: name}},
+                {'_id': {$ne: new ObjectId(req.user.id)}}
+            ]})
             .project({lastname: 1, firstname: 1, userImage: 1, _id: 1, followers: 1})
 
             res.status(200).json(listUser);
