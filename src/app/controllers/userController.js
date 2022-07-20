@@ -225,6 +225,19 @@ const userController = {
                         {_id: meID}, 
                         {$pull: {following: userID}}
                     );
+
+                    // Xoá id của mình trong danh sách người theo dõi của user
+                    await User.findByIdAndUpdate(
+                        {_id: meID}, 
+                        {$pull: {followers: userID}}
+                    );
+
+                    // Xoá id của user trong danh sách đang theo dõi của mình
+                    await User.findByIdAndUpdate(
+                        {_id: userID}, 
+                        {$pull: {following: meID}}
+                    );
+
                     res.status(200).json("Đã chặn người dùng.");
                 }else{
                     await User.findByIdAndUpdate(
