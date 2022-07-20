@@ -208,12 +208,23 @@ const userController = {
                         {_id: meID}, 
                         {$push: {blockList: userID}}
                     );
+
+                    await User.findByIdAndUpdate(
+                        {_id: userID}, 
+                        {$push: {blockBy: meID}}
+                    );
                     
                     // Xoá id của mình trong danh sách người theo dõi của user
-                    await User.findByIdAndUpdate({_id: userID}, {$pull: {followers: meID}});
+                    await User.findByIdAndUpdate(
+                        {_id: userID}, 
+                        {$pull: {followers: meID}}
+                    );
 
                     // Xoá id của user trong danh sách đang theo dõi của mình
-                    await User.findByIdAndUpdate({_id: meID}, {$pull: {following: userID}});
+                    await User.findByIdAndUpdate(
+                        {_id: meID}, 
+                        {$pull: {following: userID}}
+                    );
                     res.status(200).json("Đã chặn người dùng.");
                 }else{
                     await User.findByIdAndUpdate(
@@ -240,7 +251,8 @@ const userController = {
             const listUser = await User.aggregate()
             .match({$and: [
                 {$text: {$search: name}},
-                {'_id': {$nin: user.blockList}}
+                {'_id': {$nin: user.blockList}},
+                {'_id': {$nin: user.blockBy}}
             ]})
             .project({lastname: 1, firstname: 1, userImage: 1, _id: 1, followers: 1})
 

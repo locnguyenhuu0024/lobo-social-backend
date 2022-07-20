@@ -81,10 +81,18 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    blockList: {
-      type: Array,
-      default: []
-    },
+    blockList: [
+      {
+        type: ObjectId,
+        ref: 'User'
+      }
+    ],
+    blockBy: [
+      {
+        type: ObjectId,
+        ref: 'User'
+      }
+    ],
     googleID: {
       type: String,
       default: null,
